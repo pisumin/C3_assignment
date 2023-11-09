@@ -55,5 +55,74 @@ int read_dict(dict dictionary[WORDNUM])
 
 void draw_dict(dict dictionary[WORDNUM])
 {
+    int initnum = 0; // 各ページの先頭の用語の番号
+    int returnTitle = 0; // 0:用語集を見る，1:タイトルへ戻る
+    char input[CHARBUFF];
+    while(1)
+    {
+        // 五十音順に10個ずつ項目を表示
+        print_item(dictionary, initnum);
+        // 入力受付
+        scanf("%s",input);
+        switch(input[0])
+        {
+            case 'A': // 前ページへ移動
+                if(initnum==0)  initnum = 30;
+                else initnum -= 10;
+                break;
+            case 'S': // タイトルへ戻る
+                returnTitle = 1;
+                break;
+            case 'D': // 次ページへ移動
+                if(initnum==30) initnum = 0;
+                else initnum += 10;
+                break;
+            case '0': case '1': case '2': case '3':
+            case '4': case '5': case '6': case '7':
+            case '8': case '9':
+                print_info(dictionary, input[0]-'0'+initnum);
+                break;
+            default:
+                printf("もう一度入力してください\n");
+                scanf("%s",input);
+                continue;
+        }
+        if(returnTitle) break;
+    }
+}
 
-} // 辞典の表示
+// init番から10個項目を列挙
+void print_item(dict dictionary[WORDNUM], int init)
+{
+    line_draw();
+    printf("～辞典～\n\n");
+    int i;
+    for(i=0;i<10;i++)
+    {
+        printf("%d：%s\n", dictionary[init+i].wordNo-init, dictionary[init+i].word);
+    }
+    printf("\n(A：前ページへ　D：次ページへ　0～9：項目選択　S：タイトル画面へ)\n");
+    line_draw();
+}
+
+// 項目の説明を表示
+void print_info(dict dictionary[WORDNUM], int number)
+{
+    char input[CHARBUFF];
+    while(1)
+    {
+        line_draw();
+        printf("～%s～\n\n", dictionary[number].word);
+        printf("　%s\n", dictionary[number].info);
+        printf("(S：戻る)\n");
+        line_draw();
+        scanf("%s", input);
+        if(input[0]=='S') break;
+        else printf("もう一度入力してください\n");
+    }
+}
+
+void line_draw()
+{
+    printf("\n----------------------------------------\n");
+}

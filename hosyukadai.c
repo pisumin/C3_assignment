@@ -1,13 +1,11 @@
 #include <stdio.h>
 #include "dict.h"
 #include "game.h"
-#define CHARBUFF 256
 
 // できればechoオフにしたいね
 
 void title_draw();
 void manual_draw();
-void line_draw();
 
 // 中断状況を保存するための外部変数
 int num; // 配られる手札の枚数
@@ -89,10 +87,5 @@ void title_draw()
 
 void manual_draw()
 {
-    
-}
 
-void line_draw()
-{
-    printf("\n----------------------------------------\n");
 }

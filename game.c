@@ -1,5 +1,6 @@
 #include <stdio.h>
 #include "game.h"
+#include "dict.h"
 
 //出来事ファイルの読み込み
 int read_event(event eve[EVENUM])
