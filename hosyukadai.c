@@ -2,15 +2,13 @@
 #include "dict.h"
 #include "game.h"
 
-// できればechoオフにしたいね
-
 void title_draw();
 void manual_draw();
 
 // 中断状況を保存するための外部変数
 int num; // 配られる手札の枚数
-int playerCard[(int)(EVENUM/2)]; // プレイヤーの手札
-int npcCard[(int)(EVENUM/2)]; // コンピュータの手札
+card playerCard[(int)(EVENUM/2)]; // プレイヤーの手札
+card npcCard[(int)(EVENUM/2)]; // コンピュータの手札
 int contFlag; // 中断データがあるかどうか．0:中断データがない，1:中断データがある
 int quitGame = 0; // ゲームの終了判定．0:継続，1:終了
 
@@ -20,17 +18,16 @@ event eve[EVENUM] = {}; // 出来事を保存
 int main()
 {
     // 辞書データ，出来事データをテキストファイルより読み込み
-    if(read_dict(dictionary)!=0)
+    if(read_dict(dictionary)!=0 || read_event(eve)!=0)
     {
         printf("failed to open\n");
     }
-//    read_event(eve);
     char input[CHARBUFF]; // 入力を保存するための変数
 
 /*    int i;
-    for(i=0;i<WORDNUM;i++)
+    for(i=0;i<EVENUM;i++)
     {
-        printf("%d:%s\n%s\n\n",dictionary[i].wordNo,dictionary[i].word,dictionary[i].info);
+        printf("%d:%s,%d\n%s\n",eve[i].eventNo,eve[i].event,eve[i].dictNum,dictionary[eve[i].dictNum].word);
     }
 */
     while(1)
@@ -40,7 +37,7 @@ int main()
         switch(input[0])
         {
             case 'D': // はじめからスタート
-                start_game();
+                start_game(eve, num, playerCard, npcCard, contFlag);
                 break;
             case 'W': // 続きからスタート
                 if(contFlag) // 中断データがあればそこからスタート
