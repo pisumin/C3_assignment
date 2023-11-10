@@ -6,6 +6,7 @@
 typedef struct dict
 {
     int wordNo; // 用語のID
+    int open; // 開放状況
     char word[WORDBUFF]; // 用語
     char info[STRBUFF]; // 用語の説明
 } dict;

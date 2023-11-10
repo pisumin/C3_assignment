@@ -32,15 +32,18 @@ int read_dict(dict dictionary[WORDNUM])
         token = strtok(str, delim);
         while(token != NULL)
         {
-            switch(c++) // 順にNo.,用語,説明
+            switch(c++) // 順にNo.,開放状況,用語,説明
             {
                 case 0:
                     dictionary[r-1].wordNo = atoi(token);
                     break;
                 case 1:
-                    strcpy(dictionary[r-1].word, token);
+                    dictionary[r-1].open = atoi(token);
                     break;
                 case 2:
+                    strcpy(dictionary[r-1].word, token);
+                    break;
+                case 3:
                     strcpy(dictionary[r-1].info, token);
                     break;
                 default:
@@ -80,12 +83,14 @@ void draw_dict(dict dictionary[WORDNUM])
             case '0': case '1': case '2': case '3':
             case '4': case '5': case '6': case '7':
             case '8': case '9':
-                print_info(dictionary, input[0]-'0'+initnum);
-                break;
+                if(dictionary[input[0]-'0'+initnum].open)
+                {
+                    print_info(dictionary, input[0]-'0'+initnum);
+                    break;
+                }
             default:
-                printf("もう一度入力してください\n");
-                scanf("%s",input);
-                continue;
+                printf("入力が正しくありません．\n");
+                break;
         }
         if(returnTitle) break;
     }
@@ -95,11 +100,17 @@ void draw_dict(dict dictionary[WORDNUM])
 void print_item(dict dictionary[WORDNUM], int init)
 {
     line_draw();
-    printf("～辞典～\n\n");
+    printf("～辞典～\n");
+    printf("　(？？？はゲームをプレイすることで開放されます．)\n\n");
     int i;
     for(i=0;i<10;i++)
     {
-        printf("%d：%s\n", dictionary[init+i].wordNo-init, dictionary[init+i].word);
+        if(dictionary[init+i].open)
+        {
+            printf("%d：%s\n", i, dictionary[init+i].word);
+        } else {
+            printf("%d：？？？？？？\n",i);
+        }
     }
     printf("\n(A：前ページへ　D：次ページへ　0～9：項目選択　S：タイトル画面へ)\n");
     line_draw();
