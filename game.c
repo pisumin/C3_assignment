@@ -54,12 +54,8 @@ int read_event(event eve[EVENUM])
     return 0;
 }
 
-/*
-ゲーム開始
-int num; // 配られる手札の枚数(NPCとプレイヤーの合計．初級6枚，中級10枚，上級20枚)
-int playerCard[(int)(EVENUM/2)]; // プレイヤーの手札
-int npcCard[(int)(EVENUM/2)]; // コンピュータの手札
-*/
+
+// ゲーム開始
 int start_game(dict dictionary[WORDNUM], event eve[EVENUM], int num, card playerCard[(int)(EVENUM/2)],card npcCard[(int)(EVENUM/2)])
 {
     char input[CHARBUFF];
@@ -220,6 +216,7 @@ int play_game(dict dictionary[WORDNUM], event eve[EVENUM], int num, card playerC
         {
             printf("「%s」が出されました。\n\n",npcCard[npc].event);
             currentcard = npcCard[npc].eventNo;
+            dictionary[eve[currentcard].dictNum].open = 1;
             printf("(W：説明を見る,D：次に進む,S：タイトルに戻る)\n");
             line_draw();
             scanf("%s", input);
@@ -261,6 +258,7 @@ int play_game(dict dictionary[WORDNUM], event eve[EVENUM], int num, card playerC
             printf("「%s」が出されました。\n\n",playerCard[input[0]-'0'].event);
             playerCard[input[0]-'0'].ishaving = 0;
             currentcard = playerCard[input[0]-'0'].eventNo;
+            dictionary[eve[currentcard].dictNum].open = 1;
 
             if(precard == -1)
             {
