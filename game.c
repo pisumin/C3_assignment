@@ -1,8 +1,8 @@
 #include <stdio.h>
 #include <string.h>
 #include <stdlib.h>
+#include <time.h>
 #include "game.h"
-#include "dict.h"
 #define EVENTFILE "event.txt"
 
 //出来事ファイルの読み込み
@@ -61,7 +61,7 @@ int playerCard[(int)(EVENUM/2)]; // プレイヤーの手札
 int npcCard[(int)(EVENUM/2)]; // コンピュータの手札
 int contFlag; // 中断データがあるかどうか．0:中断データがない，1:中断データがある
 */
-int start_game(event eve[EVENUM], int num, card playerCard[(int)(EVENUM/2)],card npcCard[(int)(EVENUM/2)], int contFlag)
+int start_game(dict dictionary[WORDNUM], event eve[EVENUM], int num, card playerCard[(int)(EVENUM/2)],card npcCard[(int)(EVENUM/2)], int *contFlag)
 {
     char input[CHARBUFF];
     // 難易度選択
@@ -71,6 +71,7 @@ int start_game(event eve[EVENUM], int num, card playerCard[(int)(EVENUM/2)],card
     printf("(0,1,2：難易度選択,S：タイトルに戻る)\n");
     line_draw();
     scanf("%s", input);
+    int isend = 0;
     while(1)
     {
         switch(input[0])
@@ -82,7 +83,7 @@ int start_game(event eve[EVENUM], int num, card playerCard[(int)(EVENUM/2)],card
             case '2':
                 num = 20; break;
             case 'S':
-                return 0;
+                isend = 1; break;
             default:
                 printf("入力が正しくありません。\n");
                 scanf("%s", input);
@@ -90,24 +91,38 @@ int start_game(event eve[EVENUM], int num, card playerCard[(int)(EVENUM/2)],card
         }
         break;
     }
+    if(isend) return 0;
 
     // 手札を配る
     // 先攻、後攻を決める　0:プレイヤー先攻、1:コンピュータ先攻
+    // 乱数SEED設定
+    srand((int)time(NULL));
     int turn = rand()%2;
-    printf("先攻：%d\n",turn);
-    handout(eve, num, playerCard, npcCard, turn);
-    int i;
-    printf("プレイヤー：\n");
-    for(i=0;i<num/2;i++)
+    while(1)
     {
-        printf("%d:%s\n",playerCard[i].eventNo,playerCard[i].event);
-    }
-    printf("コンピュータ：\n");
-    for(i=0;i<num/2;i++)
-    {
-        printf("%d:%s\n",npcCard[i].eventNo,npcCard[i].event);
+        line_draw();
+        printf("あなたは");
+        if(turn)
+        {
+            printf("後攻です。\n\n");
+        } else {
+            printf("先攻です。\n\n");
+        }
+        printf("(D：次に進む)\n");
+        line_draw();
+        scanf("%s", input);
+        if(input[0]=='D') break;
     }
 
+    // 手札の配布
+    int init;
+    handout(eve, num, playerCard, npcCard, turn, &init);
+
+    play_game(dictionary, eve, num, playerCard,npcCard, contFlag, turn, init);
+
+    line_draw();
+    printf("終わりぴょん\n");
+    line_draw();
     return 0;
 }
 
@@ -117,46 +132,52 @@ void cont_game()
 
 }
 
-void handout(event eve[EVENUM], int num, card playerCard[(int)(EVENUM/2)],card npcCard[(int)(EVENUM/2)], int turn)
+void handout(event eve[EVENUM], int num, card playerCard[(int)(EVENUM/2)],card npcCard[(int)(EVENUM/2)], int turn, int *init)
 {
     // 枚数によって開始位置を決める必要がある．
-    int init = 0;
+    *init = 0;
+    // 乱数SEED
+    srand((int)time(NULL));
     if(num == 6)
     {
         // 0~14の間でランダム
-        init = rand()%15;
+        int tmp = rand();
+        *init = tmp%15;
     } else if(num == 10) {
         // 0~10の間でランダム
-        init = rand()%11;
+        *init = rand()%11;
     }
-    printf("開始位置：%d\n",init);
 
     int i;
     // 先攻に配られるのは，initから1つ空きでnum/2個
-    int tmp = init;
+    int tmp = *init;
     for(i=0;i<num/2;i++)
     {
         if(turn)
         {
             npcCard[i].eventNo = eve[tmp].eventNo; //コンピュータ先攻
             strcpy(npcCard[i].event, eve[tmp].event);
+            npcCard[i].ishaving = 1;
         } else {
             playerCard[i].eventNo = eve[tmp].eventNo; // プレイヤー先攻
             strcpy(playerCard[i].event, eve[tmp].event);
+            playerCard[i].ishaving = 1;
         }
         tmp += 2;
     }
     // 後攻に配られるのは，init+1から1つ空きでnum/2個
-    tmp = init+1;
+    tmp = *init+1;
     for(i=0;i<num/2;i++)
     {
         if(turn)
         {
             playerCard[i].eventNo = eve[tmp].eventNo; //コンピュータ先攻
             strcpy(playerCard[i].event, eve[tmp].event);
+            playerCard[i].ishaving = 1;
         } else {
             npcCard[i].eventNo = eve[tmp].eventNo; // プレイヤー先攻
             strcpy(npcCard[i].event, eve[tmp].event);
+            npcCard[i].ishaving = 1;
         }
         tmp += 2;
     }
@@ -176,5 +197,132 @@ void handout(event eve[EVENUM], int num, card playerCard[(int)(EVENUM/2)],card n
         strcpy(tmps, playerCard[i].event);
         strcpy(playerCard[i].event, playerCard[j].event);
         strcpy(playerCard[j].event, tmps);
+    }
+}
+
+void play_game(dict dictionary[WORDNUM], event eve[EVENUM], int num, card playerCard[(int)(EVENUM/2)],card npcCard[(int)(EVENUM/2)], int *contFlag, int turn, int init)
+{
+    char input[CHARBUFF];
+    int isend = 0; // ゲームの終了を判定
+    int cnt = 0; // ターン数を数える
+    int npc = 0; // NPCが何枚目のカードを出すか
+    int precard = -1; // 1手前に出されたカードのIDを覚えておく
+    int currentcard; // 現在出されたカードのID
+    int isbreak = 0; // while文を抜けるための作業変数
+    while(cnt < num)
+    {
+        // 手札を表示
+        line_draw();
+        int i;
+        printf("～手札～\n\n");
+        for(i=0;i<num/2;i++)
+        {
+            if(playerCard[i].ishaving)
+            {
+                printf("%d:%s\n",i,playerCard[i].event);
+            }
+        }
+        // turnが0ならプレイヤーのターン，turnが1ならコンピュータのターン
+        if(turn) // コンピュータのターン
+        {
+            printf("「%s」が出されました。\n\n",npcCard[npc].event);
+            currentcard = npcCard[npc].eventNo;
+            printf("(W：説明を見る,D：次に進む,S：中断する)\n");
+            line_draw();
+            scanf("%s", input);
+            while(1)
+            {
+                switch(input[0])
+                {
+                    case 'W':
+                        print_info(dictionary, eve[currentcard].dictNum);
+                        break;
+                    case 'D':
+                        turn = 0;
+                        precard = npcCard[npc++].eventNo;
+                        cnt++;
+                        break;
+                    case 'S':
+                        *contFlag = 1;
+                        isend = 1;
+                        break;
+                    default:
+                        printf("もう一度入力してください。\n");
+                        scanf("%s", input);
+                        break;
+                }
+                break;
+            }
+        } else  {// プレイヤーのターン
+            printf("手札を選んでください。\n");
+            scanf("%s", input);
+            while(1)
+            {
+                if(!(input[0]>='0'&& input[0]<(num/2)+'0')||(!playerCard[input[0]-'0'].ishaving)) // 数字以外の入力
+                {
+                    printf("もう一度入力してください。\n");
+                    scanf("%s", input);
+                    continue;
+                }
+                break;
+            }
+
+            printf("「%s」が出されました。\n\n",playerCard[input[0]-'0'].event);
+            playerCard[input[0]-'0'].ishaving = 0;
+            currentcard = playerCard[input[0]-'0'].eventNo;
+
+            if(precard == -1)
+            {
+                if(currentcard == init) printf("正解です。\n\n");
+                else {
+                    printf("不正解です。\n\n");
+                    break;
+                }
+            } else if(currentcard == precard+1) { // 次のカードを出せた
+                printf("正解です。\n\n");
+            } else {
+                printf("不正解です。\n\n");
+                break;
+            }
+
+            printf("(W：説明を見る,D：次に進む,S：中断する)\n");
+            line_draw();
+            scanf("%s", input);
+            while(1)
+            {
+                switch(input[0])
+                {
+                    case 'W':
+                        print_info(dictionary, eve[currentcard].dictNum);
+                        printf("(W：説明を見る,D：次に進む,S：中断する)\n");
+                        line_draw();
+                        scanf("%s", input);
+                        break;
+                    case 'D':
+                        turn = 1;
+                        isbreak = 1;
+                        precard = currentcard;
+                        cnt++;
+                        break;
+                    case 'S':
+                        *contFlag = 1;
+                        isend = 1;
+                        break;
+                    default:
+                        printf("もう一度入力してください。\n");
+                        printf("(W：説明を見る,D：次に進む,S：中断する)\n");
+                        line_draw();
+                        scanf("%s", input);
+                        break;
+                }
+                if(isbreak) break;
+            }
+        }
+        if(isend)
+        {
+            printf("中断しました\n");
+            break;
+        }
+        isbreak = 0;
     }
 }

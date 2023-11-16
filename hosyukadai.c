@@ -1,5 +1,4 @@
 #include <stdio.h>
-#include "dict.h"
 #include "game.h"
 
 void title_draw();
@@ -9,7 +8,7 @@ void manual_draw();
 int num; // 配られる手札の枚数
 card playerCard[(int)(EVENUM/2)]; // プレイヤーの手札
 card npcCard[(int)(EVENUM/2)]; // コンピュータの手札
-int contFlag; // 中断データがあるかどうか．0:中断データがない，1:中断データがある
+int *contFlag; // 中断データがあるかどうか．0:中断データがない，1:中断データがある
 int quitGame = 0; // ゲームの終了判定．0:継続，1:終了
 
 dict dictionary[WORDNUM] = {}; // 辞書データ
@@ -37,8 +36,8 @@ int main()
         switch(input[0])
         {
             case 'D': // はじめからスタート
-                start_game(eve, num, playerCard, npcCard, contFlag);
-                break;
+                start_game(dictionary, eve, num, playerCard, npcCard, contFlag);
+                continue;
             case 'W': // 続きからスタート
                 if(contFlag) // 中断データがあればそこからスタート
                 {
@@ -48,13 +47,13 @@ int main()
                     scanf("%s",input);
                     continue;
                 }
-                break;
+                continue;
             case 'S': //辞典を開く
                 draw_dict(dictionary);
-                break;
+                continue;
             case 'A': // 遊び方表示
                 manual_draw();
-                break;
+                continue;
             case 'Q': // ゲーム終了
                 quitGame = 1;
                 break;
