@@ -17,7 +17,6 @@ typedef struct card
 } card;
 
 int read_event(event eve[EVENUM]); //出来事ファイルの読み込み
-int start_game(dict dictionary[WORDNUM], event eve[EVENUM], int num, card playerCard[(int)(EVENUM/2)],card npcCard[(int)(EVENUM/2)], int *contFlag); // ゲームの開始
-void cont_game(); // 中断データからゲームを開始
+int start_game(dict dictionary[WORDNUM], event eve[EVENUM], int num, card playerCard[(int)(EVENUM/2)],card npcCard[(int)(EVENUM/2)]); // ゲームの開始
 void handout(event eve[EVENUM], int num, card playerCard[(int)(EVENUM/2)],card npcCard[(int)(EVENUM/2)], int turn, int *init); // カードの配布
-int play_game(dict dictionary[WORDNUM], event eve[EVENUM], int num, card playerCard[(int)(EVENUM/2)],card npcCard[(int)(EVENUM/2)], int *contFlag, int turn, int init); // ゲームプレイを実装
+int play_game(dict dictionary[WORDNUM], event eve[EVENUM], int num, card playerCard[(int)(EVENUM/2)],card npcCard[(int)(EVENUM/2)], int turn, int init); // ゲームプレイを実装

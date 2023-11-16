@@ -4,15 +4,13 @@
 void title_draw();
 void manual_draw();
 
-// 中断状況を保存するための外部変数
 int num; // 配られる手札の枚数
 card playerCard[(int)(EVENUM/2)]; // プレイヤーの手札
 card npcCard[(int)(EVENUM/2)]; // コンピュータの手札
-int contFlag = 0; // 中断データがあるかどうか．0:中断データがない，1:中断データがある
 int quitGame = 0; // ゲームの終了判定．0:継続，1:終了
 
-dict dictionary[WORDNUM] = {}; // 辞書データ
-event eve[EVENUM] = {}; // 出来事を保存
+dict dictionary[WORDNUM]; // 辞書データ
+event eve[EVENUM]; // 出来事を保存
 
 int main()
 {
@@ -30,17 +28,7 @@ int main()
         switch(input[0])
         {
             case 'D': // はじめからスタート
-                start_game(dictionary, eve, num, playerCard, npcCard, &contFlag);
-                continue;
-            case 'W': // 続きからスタート
-                if(contFlag) // 中断データがあればそこからスタート
-                {
-                    cont_game();
-                } else {
-                    printf("もう一度入力してください\n");
-                    scanf("%s",input);
-                    continue;
-                }
+                start_game(dictionary, eve, num, playerCard, npcCard);
                 continue;
             case 'S': //辞典を開く
                 draw_dict(dictionary);
@@ -68,7 +56,6 @@ void title_draw()
     line_draw();
     printf("～新撰組の軌跡～\n\n");
     printf("D：はじめからスタート\n");
-    if(contFlag) printf("W：続きからスタート\n");
     printf("S：用語集を開く\n");
     printf("A：遊び方を見る\n");
     printf("Q：ゲーム終了\n");
@@ -82,10 +69,10 @@ void manual_draw()
     printf("このゲームは、江戸時代・幕末期に活躍した新撰組にまつわる出来事を年代順に並べ替えるゲームです。\n");
     printf("数ある史実上の出来事より、20個をピックアップしました。\n");
     printf("ゲームは、次の手順で進みます。\n\n");
-    printf("1:はじめから遊ぶ場合は、まず難易度を選択します。\n　(初級は6個、中級は10個、上級は20個の出来事を並べ替えます。)\n");
+    printf("1:まず難易度を選択します。\n　(初級は6個、中級は10個、上級は20個の出来事を並べ替えます。)\n");
     printf("2:選んだ難易度に応じて、手札がコンピュータとプレイヤーに配られます。\n　手札はコンピュータ→プレイヤー→コンピュータのように、交互に連続するように配られます。\n");
     printf("3:先攻、後攻が表\示されるので、時系列が早いものから交互に出していきます。\n");
-    printf("4:見事手札を出し切ったらゲームクリアとなります。\n\n");
+    printf("4:手札を出し切ったらゲームクリアとなります。\n\n");
     printf("プレイ中は、出された出来事の説明をその場で見ることができますので、ぜひご活用ください。\n\n");
     printf("(S：タイトルに戻る)\n");
     line_draw();

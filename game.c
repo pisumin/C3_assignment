@@ -59,9 +59,8 @@ int read_event(event eve[EVENUM])
 int num; // 配られる手札の枚数(NPCとプレイヤーの合計．初級6枚，中級10枚，上級20枚)
 int playerCard[(int)(EVENUM/2)]; // プレイヤーの手札
 int npcCard[(int)(EVENUM/2)]; // コンピュータの手札
-int contFlag; // 中断データがあるかどうか．0:中断データがない，1:中断データがある
 */
-int start_game(dict dictionary[WORDNUM], event eve[EVENUM], int num, card playerCard[(int)(EVENUM/2)],card npcCard[(int)(EVENUM/2)], int *contFlag)
+int start_game(dict dictionary[WORDNUM], event eve[EVENUM], int num, card playerCard[(int)(EVENUM/2)],card npcCard[(int)(EVENUM/2)])
 {
     char input[CHARBUFF];
     // 難易度選択
@@ -118,20 +117,13 @@ int start_game(dict dictionary[WORDNUM], event eve[EVENUM], int num, card player
     int init;
     handout(eve, num, playerCard, npcCard, turn, &init);
 
-    // ゲームの開始 中断された場合は0，最後までプレイした場合は1を返す
-    int isclear = play_game(dictionary, eve, num, playerCard,npcCard, contFlag, turn, init);
+    // ゲームの開始
+    play_game(dictionary, eve, num, playerCard,npcCard, turn, init);
 
     line_draw();
     printf("ゲームを終了しました\nタイトルに戻ります\n");
-    if(isclear) *contFlag = 0;
     line_draw();
     return 0;
-}
-
-// 中断データからゲームを開始
-void cont_game()
-{
-
 }
 
 void handout(event eve[EVENUM], int num, card playerCard[(int)(EVENUM/2)],card npcCard[(int)(EVENUM/2)], int turn, int *init)
@@ -202,7 +194,7 @@ void handout(event eve[EVENUM], int num, card playerCard[(int)(EVENUM/2)],card n
     }
 }
 
-int play_game(dict dictionary[WORDNUM], event eve[EVENUM], int num, card playerCard[(int)(EVENUM/2)],card npcCard[(int)(EVENUM/2)], int *contFlag, int turn, int init)
+int play_game(dict dictionary[WORDNUM], event eve[EVENUM], int num, card playerCard[(int)(EVENUM/2)],card npcCard[(int)(EVENUM/2)], int turn, int init)
 {
     char input[CHARBUFF];
     int isend = 0; // ゲームの終了を判定
@@ -210,7 +202,6 @@ int play_game(dict dictionary[WORDNUM], event eve[EVENUM], int num, card playerC
     int npc = 0; // NPCが何枚目のカードを出すか
     int precard = -1; // 1手前に出されたカードのIDを覚えておく
     int currentcard; // 現在出されたカードのID
-    int isclear = 1; // クリア状況を保存：0:ゲームを中断，1:ゲームクリア
     while(cnt < num)
     {
         // 手札を表示
@@ -229,7 +220,7 @@ int play_game(dict dictionary[WORDNUM], event eve[EVENUM], int num, card playerC
         {
             printf("「%s」が出されました。\n\n",npcCard[npc].event);
             currentcard = npcCard[npc].eventNo;
-            printf("(W：説明を見る,D：次に進む,S：中断する)\n");
+            printf("(W：説明を見る,D：次に進む,S：タイトルに戻る)\n");
             line_draw();
             scanf("%s", input);
             while(1)
@@ -245,9 +236,7 @@ int play_game(dict dictionary[WORDNUM], event eve[EVENUM], int num, card playerC
                         cnt++;
                         break;
                     case 'S':
-                        *contFlag = 1;
                         isend = 1;
-                        isclear = 0;
                         break;
                     default:
                         printf("もう一度入力してください。\n");
@@ -287,7 +276,7 @@ int play_game(dict dictionary[WORDNUM], event eve[EVENUM], int num, card playerC
                 break;
             }
 
-            printf("(W：説明を見る,D：次に進む,S：中断する)\n");
+            printf("(W：説明を見る,D：次に進む,S：タイトルに戻る)\n");
             line_draw();
             scanf("%s", input);
             while(1)
@@ -296,7 +285,7 @@ int play_game(dict dictionary[WORDNUM], event eve[EVENUM], int num, card playerC
                 {
                     case 'W':
                         print_info(dictionary, eve[currentcard].dictNum);
-                        printf("(W：説明を見る,D：次に進む,S：中断する)\n");
+                        printf("(W：説明を見る,D：次に進む,S：タイトルに戻る)\n");
                         line_draw();
                         scanf("%s", input);
                         break;
@@ -306,9 +295,7 @@ int play_game(dict dictionary[WORDNUM], event eve[EVENUM], int num, card playerC
                         cnt++;
                         break;
                     case 'S':
-                        *contFlag = 1;
                         isend = 1;
-                        isclear = 0;
                         break;
                     default:
                         printf("もう一度入力してください。\n");
@@ -319,9 +306,9 @@ int play_game(dict dictionary[WORDNUM], event eve[EVENUM], int num, card playerC
         }
         if(isend)
         {
-            printf("中断しました\n");
+            printf("タイトルに戻ります\n");
             break;
         }
     }
-    return isclear;
+    return 0;
 }
