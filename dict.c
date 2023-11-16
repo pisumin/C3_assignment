@@ -124,7 +124,17 @@ void print_info(dict dictionary[WORDNUM], int number)
     {
         line_draw();
         printf("Å`%sÅ`\n\n", dictionary[number].word);
-        printf("Å@%s\n", dictionary[number].info);
+//        printf("Å@%s\n", dictionary[number].info);
+
+        char delim[] = " ";
+        char *token;
+        token = strtok(dictionary[number].info, delim);
+        while(token != NULL)
+        {
+            printf("Å@%s\n", token);
+            token = strtok(NULL, delim);
+        }
+
         printf("(SÅFñﬂÇÈ)\n");
         line_draw();
         scanf("%s", input);
@@ -135,5 +145,5 @@ void print_info(dict dictionary[WORDNUM], int number)
 
 void line_draw()
 {
-    printf("\n----------------------------------------\n");
+    printf("\n----------------------------------------------------------------------------------------------\n");
 }
