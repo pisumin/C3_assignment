@@ -4,20 +4,20 @@
 
 typedef struct event
 {
-    int eventNo; // ?ｿｽo?ｿｽ?ｿｽ?ｿｽ?ｿｽ?ｿｽ?ｿｽID
-    char event[WORDBUFF]; // ?ｿｽo?ｿｽ?ｿｽ?ｿｽ?ｿｽ?ｿｽﾌ厄ｿｽ?ｿｽO
-    int dictNum; // ?ｿｽ?ｿｽ?ｿｽT?ｿｽﾌ番搾ｿｽ
+    int eventNo; // 出来事のID
+    char event[WORDBUFF]; // 出来事名
+    int dictNum; // 関連する辞書のID
 } event;
 
 typedef struct card
 {
-    int eventNo;
-    char event[WORDBUFF];
-    int ishaving;
+    int eventNo; // 出来事のID
+    char event[WORDBUFF]; // 出来事名
+    int ishaving; // 手元にあるカードか
 } card;
 
-int read_event(event eve[EVENUM]); //?ｿｽo?ｿｽ?ｿｽ?ｿｽ?ｿｽ?ｿｽt?ｿｽ@?ｿｽC?ｿｽ?ｿｽ?ｿｽﾌ読み搾ｿｽ?ｿｽ?ｿｽ
-int start_game(dict dictionary[WORDNUM], event eve[EVENUM], int num, card playerCard[(int)(EVENUM/2)],card npcCard[(int)(EVENUM/2)], int *contFlag); // ?ｿｽQ?ｿｽ[?ｿｽ?ｿｽ?ｿｽJ?ｿｽn
-void cont_game(); // ?ｿｽ?ｿｽ?ｿｽf?ｿｽf?ｿｽ[?ｿｽ^?ｿｽ?ｿｽ?ｿｽ?ｿｽ?ｿｽQ?ｿｽ[?ｿｽ?ｿｽ?ｿｽ?ｿｽ?ｿｽJ?ｿｽn
-void handout(event eve[EVENUM], int num, card playerCard[(int)(EVENUM/2)],card npcCard[(int)(EVENUM/2)], int turn, int *init); // ?ｿｽ?ｿｽ?ｿｽD?ｿｽ?ｿｽ?ｿｽz?ｿｽ?ｿｽ
-void play_game(dict dictionary[WORDNUM], event eve[EVENUM], int num, card playerCard[(int)(EVENUM/2)],card npcCard[(int)(EVENUM/2)], int *contFlag, int turn, int init);
+int read_event(event eve[EVENUM]); //出来事ファイルの読み込み
+int start_game(dict dictionary[WORDNUM], event eve[EVENUM], int num, card playerCard[(int)(EVENUM/2)],card npcCard[(int)(EVENUM/2)], int *contFlag); // ゲームの開始
+void cont_game(); // 中断データからゲームを開始
+void handout(event eve[EVENUM], int num, card playerCard[(int)(EVENUM/2)],card npcCard[(int)(EVENUM/2)], int turn, int *init); // カードの配布
+int play_game(dict dictionary[WORDNUM], event eve[EVENUM], int num, card playerCard[(int)(EVENUM/2)],card npcCard[(int)(EVENUM/2)], int *contFlag, int turn, int init); // ゲームプレイを実装

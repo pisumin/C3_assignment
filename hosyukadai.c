@@ -8,7 +8,7 @@ void manual_draw();
 int num; // 配られる手札の枚数
 card playerCard[(int)(EVENUM/2)]; // プレイヤーの手札
 card npcCard[(int)(EVENUM/2)]; // コンピュータの手札
-int *contFlag; // 中断データがあるかどうか．0:中断データがない，1:中断データがある
+int contFlag = 0; // 中断データがあるかどうか．0:中断データがない，1:中断データがある
 int quitGame = 0; // ゲームの終了判定．0:継続，1:終了
 
 dict dictionary[WORDNUM] = {}; // 辞書データ
@@ -23,12 +23,6 @@ int main()
     }
     char input[CHARBUFF]; // 入力を保存するための変数
 
-/*    int i;
-    for(i=0;i<EVENUM;i++)
-    {
-        printf("%d:%s,%d\n%s\n",eve[i].eventNo,eve[i].event,eve[i].dictNum,dictionary[eve[i].dictNum].word);
-    }
-*/
     while(1)
     {
         title_draw(); //タイトル画面の描画
@@ -36,7 +30,7 @@ int main()
         switch(input[0])
         {
             case 'D': // はじめからスタート
-                start_game(dictionary, eve, num, playerCard, npcCard, contFlag);
+                start_game(dictionary, eve, num, playerCard, npcCard, &contFlag);
                 continue;
             case 'W': // 続きからスタート
                 if(contFlag) // 中断データがあればそこからスタート
