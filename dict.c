@@ -120,15 +120,16 @@ void print_item(dict dictionary[WORDNUM], int init)
 void print_info(dict dictionary[WORDNUM], int number)
 {
     char input[CHARBUFF];
+    char str[STRBUFF];
     while(1)
     {
         line_draw();
         printf("Å`%sÅ`\n\n", dictionary[number].word);
-//        printf("Å@%s\n", dictionary[number].info);
+        strcpy(str, dictionary[number].info);
 
         char delim[] = " ";
         char *token;
-        token = strtok(dictionary[number].info, delim);
+        token = strtok(str, delim);
         while(token != NULL)
         {
             printf("Å@%s\n", token);
