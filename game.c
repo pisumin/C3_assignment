@@ -226,7 +226,10 @@ int play_game(dict dictionary[WORDNUM], event eve[EVENUM], int num, card playerC
                 {
                     case 'W':
                         print_info(dictionary, eve[currentcard].dictNum);
-                        break;
+                        printf("(W：説明を見る,D：次に進む,S：タイトルに戻る)\n");
+                        line_draw();
+                        scanf("%s", input);
+                        continue;
                     case 'D':
                         turn = 0;
                         precard = npcCard[npc++].eventNo;
@@ -286,7 +289,7 @@ int play_game(dict dictionary[WORDNUM], event eve[EVENUM], int num, card playerC
                         printf("(W：説明を見る,D：次に進む,S：タイトルに戻る)\n");
                         line_draw();
                         scanf("%s", input);
-                        break;
+                        continue;
                     case 'D':
                         turn = 1;
                         precard = currentcard;
